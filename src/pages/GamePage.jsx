@@ -73,7 +73,7 @@ const GamePage = () => {
 
     const handleGameOver = () => {
         setIsGameOver(true);
-        saveScoreToDB(highScore);
+        saveScoreToDB(score);
         
         Swal.fire({
             title: '<span style="color:#ff0055; font-family:serif; font-weight:900;">SYSTEM OVERLOAD!</span>',
@@ -101,16 +101,27 @@ const GamePage = () => {
         setIsPaused(false);
     };
 
-    const saveScoreToDB = async (finalScore) => {
-        if (!user?.email) return;
-        try {
-            await fetch('https://shk-game-backend.vercel.app/api/save-score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: playerName, email: user?.email, score: finalScore, photo: user?.photoURL }),
-            });
-        } catch (err) { console.error(err); }
-    };
+    // GamePage.jsx er handleGameOver ba score saving function
+// 🔴 GamePage.jsx er bhetore thaka saveScoreToDB function-ti eivabe update koro
+const saveScoreToDB = async (currentScore) => {
+    if (!user?.email) return;
+
+    try {
+        await fetch('https://shk-game-backend.vercel.app/api/save-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: playerName,      // Backend e eta 'playerName' hobe
+                email: user?.email,    // Backend e eta 'playerEmail' hobe
+                score: currentScore,   // Backend e eta 'playerScore' hobe ($max logic e kaj korbe)
+                photo: user?.photoURL  // Backend e eta 'playerPhoto' hobe
+            }),
+        });
+        console.log("Score update attempt sent!");
+    } catch (err) { 
+        console.error("Network Error:", err); 
+    }
+};
 
     return (
         <div className="min-h-screen bg-[#050505] text-white p-4 font-mono select-none overflow-hidden flex flex-col items-center">
